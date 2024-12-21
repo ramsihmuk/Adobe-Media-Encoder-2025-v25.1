@@ -1,0 +1,38 @@
+name: Star
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "*/5 * * * *"
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Modify last update
+        run: |
+          d='DATE '`date '+%Y-%m-%d %H:%M:%S'`
+          echo $d > LOG
+          
+      - name: Commit changes
+        run: | 
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "${{ github.repository_owner }}"
+          git add -A
+          
+          arr=("Update" "Update" "Update" "Update" "Update" "Update" "Update" "Update" "Update" "Update")
+          
+          rand=$((RANDOM % ${#arr[@]}))
+          
+          git commit -m "${arr[$rand]}"
+          
+      - name: Push changes
+        run: |
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
